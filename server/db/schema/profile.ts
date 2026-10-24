@@ -1,5 +1,5 @@
 import { relations, sql } from "drizzle-orm";
-import { integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { integer, sqliteTable, text, real } from "drizzle-orm/sqlite-core";
 import { user } from "./auth";
 
 export const userProfiles = sqliteTable("user_profiles", {
@@ -9,6 +9,7 @@ export const userProfiles = sqliteTable("user_profiles", {
   timezone: text("timezone").notNull().default("UTC"),
   locale: text("locale").notNull().default("en"),
   bio: text("bio").notNull().default(""),
+  trustScores: text("trust_scores", { mode: "json" }).default("{}").$type<Record<string, number>>(),
   updatedAt: integer("updated_at", { mode: "timestamp_ms" })
     .default(sql`(cast(unixepoch('subsecond') * 1000 as integer))`)
     .$onUpdate(() => new Date())
