@@ -6,6 +6,9 @@ import {
   type MemoryCategory,
   type MemoryEntry,
   type MemorySource,
+  type L2EpisodicMemory,
+  type L3SemanticMemory,
+  type L4ProceduralMemory,
 } from "#shared/types/memory";
 import { normalizeMemoryContent, parseMemoryImport } from "~~/server/utils/memory-import";
 
@@ -203,4 +206,44 @@ export async function updateMemoryEntry(userId: string, id: string, content: str
     .limit(1);
 
   return row ? rowToEntry(row) : undefined;
+}
+
+export async function getL2Memory(userId: string): Promise<L2EpisodicMemory[]> {
+  const rows = await db.select()
+    .from(schema.l2EpisodicMemory)
+    .where(eq(schema.l2EpisodicMemory.userId, userId))
+    .orderBy(asc(schema.l2EpisodicMemory.createdAt));
+
+  return rows.map(r => ({
+    ...r,
+    type: r.type as "conversation" | "action" | "observation",
+    createdAt: r.createdAt.getTime(),
+    updatedAt: r.updatedAt.getTime(),
+  }));
+}
+
+export async function getL3Memory(userId: string): Promise<L3SemanticMemory[]> {
+  const rows = await db.select()
+    .from(schema.l3SemanticMemory)
+    .where(eq(schema.l3SemanticMemory.userId, userId))
+    .orderBy(asc(schema.l3SemanticMemory.createdAt));
+
+  return rows.map(r => ({
+    ...r,
+    createdAt: r.createdAt.getTime(),
+    updatedAt: r.updatedAt.getTime(),
+  }));
+}
+
+export async function getL4Memory(userId: string): Promise<L4ProceduralMemory[]> {
+  const rows = await db.select()
+    .from(schema.l4ProceduralMemory)
+    .where(eq(schema.l4ProceduralMemory.userId, userId))
+    .orderBy(asc(schema.l4ProceduralMemory.createdAt));
+
+  return rows.map(r => ({
+    ...r,
+    createdAt: r.createdAt.getTime(),
+    updatedAt: r.updatedAt.getTime(),
+  }));
 }
